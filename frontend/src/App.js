@@ -50,11 +50,7 @@ function App() {
   const handleChageMessage = ()=>{
     // send message througn api
     const message = chatFieldRef.current.value.trim();
-    if(interlocutor!==null){
-      setChats([...chats, {message: message, by: userName, private:true}])
-      return;
-    }
-    setChats([...chats, {message: message, by: userName}])
+    setChats([...chats, {message: message, by: userName, for: interlocutor}])
     socket.emit('message', {message: message, by: userName, for: interlocutor})
     if (chatAreaRef.current) {
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
@@ -65,7 +61,7 @@ function App() {
     console.log('message.for!==null',message.for!==null)
     if(message.for!==null){
       if(message.for === userName)
-        setChats([...chats, {message: message.message, by: message.by, private: true}])
+        setChats([...chats, {message: message.message, by: message.by, for: message.for}])
       return;
     }
     else{
@@ -109,7 +105,7 @@ function App() {
         <div className="w-4/6 m-6">
           <div className="text-xl">Live chat</div>
           <div ref={chatAreaRef} className="h-96 bg-gray-300 flex flex-col rounded-md overflow-auto py-10 px-2">
-            {chats? chats.map(chat=><div className={`mx-5 my-1  flex flex-col ${chat.by===userName?'self-end':'self-start'}`}><div className="text-sm font-normal self-end">{ chat.private? chat.for===userName ?"private msg by "+chat.by : chat.by===userName? "private msg to "+chat.for: chat.by : chat.by}</div><div className={`rounded-md px-2 py-.5 cursor-pointer ${chat.private? "bg-zinc-600": "bg-zinc-400"} text-lg font-bold`}>{chat.message}</div></div>): null}
+            {chats? chats.map(chat=><div className={`mx-5 my-1  flex flex-col ${chat.by===userName?'self-end':'self-start'}`}><div className="text-sm font-normal self-end">{ chat.for ? chat.for===userName ?"msg from "+chat.by : chat.by===userName? "msg to "+chat.for: chat.by : chat.by}</div><div className={`rounded-md px-2 py-.5 cursor-pointer ${chat.for? "bg-zinc-200": "bg-zinc-400"} text-lg font-bold`}>{chat.message}</div></div>): null}
           </div>
           <div className="flex">
             <textarea ref={chatFieldRef} className="text-md font-medium px-2 border-2 border-zinc-500 rounded-md w-5/6" placeholder="Enter your message here..."/>
